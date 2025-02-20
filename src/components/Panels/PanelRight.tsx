@@ -23,7 +23,7 @@ const PanelRight: React.FC<PanelRightProps> = ({
     // Initialize shared width if not already set in the EventBus
     if (eventBus.getPanelWidth() === 400) {
       eventBus.setPanelWidth(panelWidth); // Use the provided panelWidth prop
-    } 
+    }
     setWidth(eventBus.getPanelWidth()); // Set the current width from EventBus
 
     const handleActivePanel = (panel: "first" | "second" | "third" | "fourth" | null) => {

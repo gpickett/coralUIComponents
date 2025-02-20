@@ -31,14 +31,15 @@ const PanelLeftToolbar: React.FC<PanelLeftToolbarProps> = ({
             display: "flex",
             alignItems: "center",
             gap: "6px",
-            flex: "1 1 auto",
-            overflow: "hidden", // Ensure title section is contained
+            flexShrink: 1, // Allow shrinking when needed
+            overflow: "hidden",
+            minWidth: 0, // Prevents breaking layout when shrinking
           }}
         >
           {panelIcon && (
             <div
               style={{
-                flexShrink: 0, // Prevent the icon from shrinking
+                flexShrink: 0, // Prevents icon from shrinking
                 display: "flex",
                 alignItems: "center",
               }}
@@ -64,7 +65,10 @@ const PanelLeftToolbar: React.FC<PanelLeftToolbarProps> = ({
         style={{
           display: "flex",
           alignItems: "center",
-          gap: "0",
+ 
+          flexGrow: 1, // Allows `panelTools` to take the remaining space
+          justifyContent: "flex-end", // Makes sure buttons hug their content
+          minWidth: 0, // Prevents layout breaking when content shrinks
         }}
       >
         {children}

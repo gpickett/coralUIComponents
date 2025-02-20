@@ -1,6 +1,6 @@
 import React from "react";
 import { Avatar, Subtitle2 } from "@fluentui/react-components";
-import MsftColor from "../../imports/MsftColor.js"; // Default icon component
+import MsftColor from "../../imports/MsftColor.tsx"; // Default icon component
 
 /**
  * @component

@@ -59,12 +59,19 @@ import {
     DocumentSparkleRegular,
     SparkleFilled,
     SparkleRegular,
+    StarFilled,
+    StarRegular,
+    MoreHorizontalFilled,
+    MoreHorizontalRegular,
     bundleIcon
   } from "@fluentui/react-icons";
   
+
+  export const MoreHorizontal = bundleIcon(MoreHorizontalFilled, MoreHorizontalRegular);
   export const ArrowExit = bundleIcon(ArrowExitFilled, ArrowExitRegular);
   export const Bookmark = bundleIcon(BookmarkFilled, BookmarkRegular);
   export const Sparkle = bundleIcon(SparkleFilled, SparkleRegular);
+  export const Star = bundleIcon(StarFilled, StarRegular);
   export const DocumentSparkle = bundleIcon(DocumentSparkleFilled, DocumentSparkleRegular);
   export const Dismiss = bundleIcon(DismissFilled, DismissRegular);
   export const DrawerArrowDownload = bundleIcon(DrawerArrowDownloadFilled, DrawerArrowDownloadRegular);
