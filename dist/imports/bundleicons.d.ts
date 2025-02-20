@@ -1,6 +1,8 @@
+export declare const MoreHorizontal: import("@fluentui/react-icons").FluentIcon;
 export declare const ArrowExit: import("@fluentui/react-icons").FluentIcon;
 export declare const Bookmark: import("@fluentui/react-icons").FluentIcon;
 export declare const Sparkle: import("@fluentui/react-icons").FluentIcon;
+export declare const Star: import("@fluentui/react-icons").FluentIcon;
 export declare const DocumentSparkle: import("@fluentui/react-icons").FluentIcon;
 export declare const Dismiss: import("@fluentui/react-icons").FluentIcon;
 export declare const DrawerArrowDownload: import("@fluentui/react-icons").FluentIcon;

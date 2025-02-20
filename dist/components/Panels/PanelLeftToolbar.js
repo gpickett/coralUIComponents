@@ -12,8 +12,9 @@ const PanelLeftToolbar = ({ panelIcon, panelTitle, children, }) => {
                     display: "flex",
                     alignItems: "center",
                     gap: "6px",
-                    flex: "1 1 auto",
-                    overflow: "hidden", // Ensure title section is contained
+                    flexShrink: 1,
+                    overflow: "hidden",
+                    minWidth: 0, // Prevents breaking layout when shrinking
                 }, children: [panelIcon && (_jsx("div", { style: {
                             flexShrink: 0,
                             display: "flex",
@@ -25,7 +26,9 @@ const PanelLeftToolbar = ({ panelIcon, panelTitle, children, }) => {
                         }, children: panelTitle }))] })), _jsx("div", { className: "panelTools", style: {
                     display: "flex",
                     alignItems: "center",
-                    gap: "0",
+                    flexGrow: 1,
+                    justifyContent: "flex-end",
+                    minWidth: 0, // Prevents layout breaking when content shrinks
                 }, children: children })] }));
 };
 export default PanelLeftToolbar;

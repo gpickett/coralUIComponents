@@ -1,10 +1,8 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { Avatar, Subtitle2 } from "@fluentui/react-components";
-import MsftColor from "../../imports/MsftColor.js"; // Import your default icon component
+import MsftColor from "../../imports/MsftColor.tsx"; // Default icon component
 const Header = ({ logo, title = "Microsoft", subtitle, children }) => {
-    return (
-    // HEADER WRAPPER
-    _jsxs("header", { style: {
+    return (_jsxs("header", { style: {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
@@ -15,7 +13,7 @@ const Header = ({ logo, title = "Microsoft", subtitle, children }) => {
             height: "64px",
             boxSizing: "border-box",
             gap: "12px",
-        }, children: [_jsxs("div", { style: {
+        }, "data-figma-component": "Header", children: [_jsxs("div", { style: {
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
