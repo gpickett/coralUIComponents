@@ -1,6 +1,8 @@
 {
   "name": "@ctocoral/react-components",
   "version": "1.0.19",
+  "homepage": "https://mochimilk.github.io/coral-react-components",
+
   "description": "A set of reusable React components for the Coral design system.",
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.ts",
@@ -17,7 +19,9 @@
     "start": "vite",
     "build": "tsc && vite build",
     "storybook": "npx storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+      "predeploy": "npm run build",
+  "deploy": "gh-pages -d build"
   },
   "peerDependencies": {
     "@fluentui/react-components": "9.56.7",
