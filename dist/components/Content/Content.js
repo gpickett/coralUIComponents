@@ -14,8 +14,12 @@ const Content = ({ children }) => {
             position: "relative",
             minWidth: '320px',
         }, children: [toolbar && _jsx("div", { style: { flexShrink: 0 }, children: toolbar }), _jsx("div", { className: "panelContent", style: {
+                    display: "flex",
+                    flexDirection: "column",
                     flex: 1,
-                    overflowY: "auto",
+                    width: '100%',
+                    overflow: "hidden",
+                    minHeight: 0, // allow child to shrink properly
                 }, children: content })] }));
 };
 export default Content;

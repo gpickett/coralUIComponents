@@ -43,6 +43,8 @@ import {
     PersonFeedbackRegular,
     SearchFilled,
     SearchRegular,
+    SendFilled,
+    SendRegular,
     ShareFilled,
     ShareRegular,
     TreeDeciduousFilled,
@@ -63,10 +65,13 @@ import {
     StarRegular,
     MoreHorizontalFilled,
     MoreHorizontalRegular,
-    bundleIcon
+    bundleIcon,
+    CopyFilled,
+    CopyRegular
   } from "@fluentui/react-icons";
   
-
+  export const Copy = bundleIcon(CopyFilled, CopyRegular);
+  export const Send = bundleIcon(SendFilled, SendRegular);
   export const MoreHorizontal = bundleIcon(MoreHorizontalFilled, MoreHorizontalRegular);
   export const ArrowExit = bundleIcon(ArrowExitFilled, ArrowExitRegular);
   export const Bookmark = bundleIcon(BookmarkFilled, BookmarkRegular);

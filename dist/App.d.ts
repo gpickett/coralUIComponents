@@ -1,4 +1,4 @@
-import React from "react";
+/// <reference types="react" />
 import "./index.css";
 declare const App: React.FC;
 export default App;

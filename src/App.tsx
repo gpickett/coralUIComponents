@@ -1,106 +1,116 @@
-import React, { useState } from "react";
 import PanelLeft from "./components/Panels/PanelLeft.js";
-import PanelRight from "./components/Panels/PanelRight.js";
-import PanelLeftToolbar from "./components/Panels/PanelLeftToolbar.js";
-import { Avatar, Button, ToggleButton, ToolbarButton, ToolbarDivider } from "@fluentui/react-components";
-import { Add20Regular, Bookmark20Filled, Cube20Filled, DocumentSparkle20Filled, DrawerArrowDownload20Filled, MoreHorizontalRegular, Sparkle20Filled } from "@fluentui/react-icons";
+import {
+  Avatar,
+  Button,
+  ToggleButton,
+  ToolbarDivider,
+} from "@fluentui/react-components";
+import {
+  MoreHorizontalRegular,
+  Sparkle20Filled
+} from "@fluentui/react-icons";
 import Header from "./components/Header/Header.js";
-import PanelRightToolbar from "./components/Panels/PanelRightToolbar.js";
 import "./index.css";
 import Content from "./components/Content/Content.js";
 import ContentToolbar from "./components/Content/ContentToolbar.js";
-import { Bookmark, Cube, DocumentSparkle, DrawerArrowDownload, Search, Sparkle } from "./imports/bundleicons.js";
+import {
+  Bookmark,
+  DocumentSparkle,
+  DrawerArrowDownload,
+  Search,
+  Sparkle,
+} from "./imports/bundleicons.js";
 import PanelRightFourth from "./PanelRightFourth.js";
 import HeaderTools from "./components/Header/HeaderTools.js";
 import PanelRightToggles from "./components/Header/PanelRightToggles.js";
-import PanelLeftSearch from "./modules/PanelLeftSearch.js";
-import Dashboard from "./modules/Dashboard.js";  // <-- Import the dashboard
-
+import PanelRightThird from "./PanelRightThird.js";
+import PanelRightSecond from "./PanelRightSecond.js";
+import PanelRightFirst from "./PanelRightFirst.js";
+import PanelLeftToolbar from "./components/Panels/PanelLeftToolbar.js";
+import Chat from "./modules/Chat.js";
 
 const App: React.FC = () => {
-  const [selectedItems, setSelectedItems] = useState<Record<string, boolean>>({});
+
 
   return (
-
-    <div style={{ display: "flex", flexDirection: "column", height: "100vh", overflow: "hidden", backgroundColor: "var(--colorNeutralBackground3)" }}>
-
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100vh",
+        overflow: "hidden",
+        backgroundColor: "var(--colorNeutralBackground3)",
+      }}
+    >
       {/* Header */}
-      <Header subtitle="Coral">
+      <Header
+      title="Microsoft"
+      subtitle="Coral"
+      logo={null}
+      >
         <HeaderTools>
           <Avatar />
           <ToolbarDivider />
+          {/* Panel Right Toggles define different panels the user can surface in the header. If there is only one, feel free to remove unused toggles. */}
           <PanelRightToggles>
             <ToggleButton appearance="subtle" icon={<Sparkle />} />
             <ToggleButton appearance="subtle" icon={<DocumentSparkle />} />
             <ToggleButton appearance="subtle" icon={<Bookmark />} />
             <ToggleButton appearance="subtle" icon={<DrawerArrowDownload />} />
           </PanelRightToggles>
-          <ToolbarDivider />
-          <ToolbarButton icon={<Cube />} />
-          <ToolbarButton icon={<Cube />} />
         </HeaderTools>
       </Header>
 
       <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
+
         {/* Left Panel */}
         <div style={{ flexShrink: 0, display: "flex", overflow: "hidden" }}>
-          <PanelLeftSearch selectedItems={selectedItems} setSelectedItems={setSelectedItems} />
+          <PanelLeft 
+          panelWidth={280} // Defines the entry width for left panel
+          panelResize={true} // Defines if the panel is resizable
+          >
+            <PanelLeftToolbar
+            panelTitle='Panel Left' // Defines the Title for the left panel
+            panelIcon={null} // Defines the icon for the Left Panel
+             />
+          </PanelLeft>
         </div>
 
         {/* Main Content with Dashboard */}
         <Content>
           <ContentToolbar
-          // panelIcon={<Cube20Filled />}
-          panelTitle="Dashboard">
-            <Button appearance="subtle" icon={<Search />} /><ToolbarDivider />
+            // panelIcon={<Cube20Filled />}
+            panelTitle="Copilot"
+            panelIcon={<Sparkle20Filled/>}
+          >
+            <Button appearance="subtle" icon={<Search />} />
+            <ToolbarDivider />
             <Button appearance="subtle" icon={<MoreHorizontalRegular />} />
           </ContentToolbar>
 
-          {/* Dashboard View */}
 
-          <div >
-            <Dashboard selectedItems={selectedItems} />
-          </div>
-
+          <Chat
+            apiUrl="http://localhost:5000"// Ensure this is correct
+            apiKey="" // API Key (only needed for OpenAI & Azure OpenAI)
+            // deploymentName="my-deployment" // Only needed for Azure OpenAI & Foundry
+            isAzureFoundry={false} // Flag for Azure AI Foundry
+            userId="user123" // Unique user ID (for multi-turn memory)
+          // onSaveMessage={saveChatHistory} // Callback to save chat history
+          // onLoadHistory={loadChatHistory} // Callback to load chat history
+          // onClearHistory={clearChatHistory} // Callback to clear chat history
+          />
 
         </Content>
 
-        {/* Right Panel */}
-        <PanelRight panelWidth={450} panelResize={true} panelType="first">
-          <PanelRightToolbar panelTitle="Copilot" panelIcon={<Sparkle20Filled />}>
-            <Button appearance="subtle" icon={<MoreHorizontalRegular />} />
-          </PanelRightToolbar>
-          <div style={{ padding: "0 16px 16px 16px" }}>
-            <p>This is the content inside the first panel.</p>
-          </div>
-        </PanelRight>
+        <PanelRightFirst />
 
-        {/* Right Secondary Panel */}
-        <PanelRight panelResize={true} panelType="second">
-          <PanelRightToolbar panelTitle="Documents" panelIcon={<DocumentSparkle20Filled />}>
-            <Button appearance="subtle" icon={<MoreHorizontalRegular />} />
-          </PanelRightToolbar>
-          <div style={{ padding: "0 16px 16px 16px" }}>
-            <p>This is the content inside the second panel.</p>
-            <p>It swaps with the previous panel when toggled.</p>
-          </div>
-        </PanelRight>
+        <PanelRightSecond />
 
-        {/* Right Secondary Panel */}
-        <PanelRight panelResize={true} panelType="third">
-          <PanelRightToolbar panelTitle="Bookmarks" panelIcon={<Bookmark20Filled />}>
-            <Button appearance="subtle" icon={<MoreHorizontalRegular />} />
-          </PanelRightToolbar>
-          <div style={{ padding: "0 16px 16px 16px" }}>
-            <p>This is the content inside the third panel.</p>
-            <p>It swaps with the previous panel when toggled.</p>
-          </div>
-        </PanelRight>
+        <PanelRightThird />
 
         <PanelRightFourth />
       </div>
     </div>
-
   );
 };
 

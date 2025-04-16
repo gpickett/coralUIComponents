@@ -25,6 +25,7 @@ const Content: React.FC<ContentProps> = ({ children }) => {
                 boxSizing: "border-box",
                 position: "relative",
                 minWidth: '320px',
+
             }}
         >
             {toolbar && <div style={{ flexShrink: 0 }}>{toolbar}</div>}
@@ -32,8 +33,14 @@ const Content: React.FC<ContentProps> = ({ children }) => {
             <div
                 className="panelContent"
                 style={{
+                    display: "flex",
+                    flexDirection: "column",
                     flex: 1,
-                    overflowY: "auto",
+                    width:'100%',
+
+    
+                    overflow: "hidden", // prevent double scrollbars
+                    minHeight: 0, // allow child to shrink properly
                 }}
             >
                 {content}

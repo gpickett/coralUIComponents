@@ -1,3 +1,5 @@
+export declare const Copy: import("@fluentui/react-icons").FluentIcon;
+export declare const Send: import("@fluentui/react-icons").FluentIcon;
 export declare const MoreHorizontal: import("@fluentui/react-icons").FluentIcon;
 export declare const ArrowExit: import("@fluentui/react-icons").FluentIcon;
 export declare const Bookmark: import("@fluentui/react-icons").FluentIcon;
