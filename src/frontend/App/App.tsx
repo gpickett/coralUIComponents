@@ -28,6 +28,7 @@ import PanelRightSecond from "./PanelRightSecond.js";
 import PanelRightFirst from "./PanelRightFirst.js";
 import PanelLeftToolbar from "./components/Panels/PanelLeftToolbar.js";
 import Chat from "./modules/Chat.js";
+import React from "react";
 
 const App: React.FC = () => {
 
