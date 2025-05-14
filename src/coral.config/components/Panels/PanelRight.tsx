@@ -6,6 +6,7 @@ interface PanelRightProps {
   panelWidth?: number; // Optional width of the panel
   panelResize?: boolean; // Whether resizing is enabled
   panelType: "first" | "second" | "third" | "fourth"; // Panel type identifier
+  defaultClosed?: boolean;
   children?: ReactNode;
 }
 
@@ -13,9 +14,12 @@ const PanelRight: React.FC<PanelRightProps> = ({
   panelWidth = 325, // Default width if not provided
   panelResize = true,
   panelType = "first", // Default to "first" if not explicitly defined
+  defaultClosed = false,
   children,
 }) => {
-  const [isActive, setIsActive] = useState(panelType === "first"); // Initialize based on the panelType
+  const [isActive, setIsActive] = useState(() =>
+    defaultClosed ? false : panelType === "first"
+  );
   const [width, setWidth] = useState<number>(panelWidth); // Initial width from props or default
   const [isHandleHovered, setIsHandleHovered] = useState(false);
 
@@ -42,6 +46,14 @@ const PanelRight: React.FC<PanelRightProps> = ({
       eventBus.off("panelWidthChanged", handleWidthChange);
     };
   }, [panelType, panelWidth]);
+
+  useEffect(() => {
+    // On initial mount, tell the header what panels are open
+    eventBus.emit("panelInitState", {
+      panelType,
+      isActive,
+    });
+  }, []);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!panelResize) return;

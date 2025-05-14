@@ -67,9 +67,12 @@ import {
     MoreHorizontalRegular,
     bundleIcon,
     CopyFilled,
-    CopyRegular
+    CopyRegular,
+    HistoryFilled,
+    HistoryRegular
   } from "@fluentui/react-icons";
   
+  export const History = bundleIcon(HistoryFilled, HistoryRegular);
   export const Copy = bundleIcon(CopyFilled, CopyRegular);
   export const Send = bundleIcon(SendFilled, SendRegular);
   export const MoreHorizontal = bundleIcon(MoreHorizontalFilled, MoreHorizontalRegular);

@@ -21,11 +21,14 @@ import {
   Button,
   Tag,
   Tooltip as FluentTooltip,
+  ToolbarDivider,
+  Caption1,
 } from "@fluentui/react-components";
 import { Copy, Send } from "../imports/bundleicons";
-import { HeartRegular } from "@fluentui/react-icons";
+import { AppFolder20Regular, Attach20Regular, HeartRegular } from "@fluentui/react-icons";
 import "./Chat.css";
 import "./prism-material-oceanic.css";
+import HeaderTools from "../components/Header/HeaderTools";
 
 // 💬 Message Type
 export interface ChatMessage {
@@ -46,6 +49,10 @@ interface ChatShellProps {
   onSaveMessage?: (userId: string, messages: ChatMessage[]) => void;
   onLoadHistory?: (userId: string) => Promise<ChatMessage[]>;
   onClearHistory?: (userId: string) => void;
+
+    // FRONTEND
+    placeholder?: string;
+    children?: React.ReactNode; // for custom tools
 }
 
 const ChatShell: React.FC<ChatShellProps> = ({
@@ -54,6 +61,8 @@ const ChatShell: React.FC<ChatShellProps> = ({
   onSaveMessage,
   onLoadHistory,
   onClearHistory,
+  placeholder,
+  children
 }) => {
   // 🧠 STATE — Owned by Frontend
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -201,8 +210,10 @@ const ChatShell: React.FC<ChatShellProps> = ({
           shape="circular"
           style={{
             bottom: inputHeight,
-            backgroundColor: "var(--colorNeutralBackgroundAlpha2)",
+            backgroundColor: "transparent",
             backdropFilter: "saturate(180%) blur(16px)",
+            color: "var(--colorNeutralForeground2)",
+            border: "1px solid var(--colorNeutralStroke1)"
           }}
         >
           Back to bottom
@@ -229,20 +240,27 @@ const ChatShell: React.FC<ChatShellProps> = ({
           }}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          placeholder="Type a message..."
+          placeholder={placeholder || "Type a message..."}
+
           rows={1}
           className="input-field"
         />
 
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", maxHeight:'32px'}}>
           <FluentTooltip content="AI-generated content may be incorrect." relationship="label">
             <Tag appearance="filled" size="small">AI Generated</Tag>
           </FluentTooltip>
-          <Button appearance="transparent" onClick={sendMessage} icon={<Send />} />
+          <HeaderTools>
+  <Button appearance="transparent" onClick={sendMessage} icon={<Send />} />
+  {children && <ToolbarDivider />}
+  {children}
+</HeaderTools>
+
+
         </div>
         <span className="focus-indicator" />
       </div>
-
+      <Caption1 style={{color:'var(--colorNeutralForeground3', marginTop:'-8px', paddingBottom:'6px', textAlign:'center'}}>AI-Generated content may be incorrect</Caption1>
       {/* 🧼 CLEAR CHAT BUTTON — Backend Optional */}
       {onClearHistory && (
         <button onClick={clearChat}>Clear Chat</button>

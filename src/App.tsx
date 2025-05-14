@@ -13,8 +13,10 @@ import {
   ToolbarDivider,
 } from "@fluentui/react-components";
 import {
+  AppGeneric20Regular,
+  Attach20Regular,
   MoreHorizontalRegular,
-  Sparkle20Filled
+  Sparkle20Filled,
 } from "@fluentui/react-icons";
 import Header from "./coral.config/components/Header/Header.js";
 import "./index.css";
@@ -24,6 +26,7 @@ import {
   Bookmark,
   DocumentSparkle,
   DrawerArrowDownload,
+  History,
   Search,
   Sparkle,
 } from "./coral.config/imports/bundleicons.js";
@@ -48,7 +51,7 @@ const App: React.FC = () => {
 
           {/* Panel visibility toggles — linked to right side modules */}
           <PanelRightToggles>
-            <ToggleButton appearance="subtle" icon={<Sparkle />} />
+            <ToggleButton appearance="subtle" icon={<History />} />
             <ToggleButton appearance="subtle" icon={<DocumentSparkle />} />
             <ToggleButton appearance="subtle" icon={<Bookmark />} />
             <ToggleButton appearance="subtle" icon={<DrawerArrowDownload />} />
@@ -61,20 +64,14 @@ const App: React.FC = () => {
         {/* Resizable navigation or filter rail */}
         <div style={{ flexShrink: 0, display: "flex", overflow: "hidden" }}>
           <PanelLeft panelWidth={280} panelResize={true}>
-            <PanelLeftToolbar
-              panelTitle='Panel Left'
-              panelIcon={null}
-            />
+            <PanelLeftToolbar panelTitle="Panel Left" panelIcon={null} />
           </PanelLeft>
         </div>
 
         {/* MAIN CONTENT AREA */}
         {/* Dynamic workspace where tools, features, and modules are rendered */}
         <Content>
-          <ContentToolbar
-            panelTitle="Copilot"
-            panelIcon={<Sparkle20Filled/>}
-          >
+          <ContentToolbar panelTitle="Copilot" panelIcon={<Sparkle20Filled />}>
             <Button appearance="subtle" icon={<Search />} />
             <ToolbarDivider />
             <Button appearance="subtle" icon={<MoreHorizontalRegular />} />
@@ -83,11 +80,15 @@ const App: React.FC = () => {
           {/* Chat Module (LLM Interface) */}
           {/* This shell is frontend-only. All backend connections must be passed via props. */}
           <Chat
+            placeholder="Ask me anything..."
             apiUrl="http://localhost:5000"
             apiKey=""
             isAzureFoundry={false}
             userId="user123"
-          />
+          >
+            <Button appearance="subtle" icon={<Attach20Regular />} />
+            <Button appearance="subtle" icon={<AppGeneric20Regular />} />
+          </Chat>
         </Content>
 
         {/* PANEL RIGHT STACK */}
