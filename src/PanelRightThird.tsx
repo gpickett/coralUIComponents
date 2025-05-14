@@ -1,8 +1,8 @@
 import React from "react";
-import PanelRight from "./components/Panels/PanelRight.js";
+import PanelRight from "./coral.config/components/Panels/PanelRight.js";
 import { Button } from "@fluentui/react-components";
 import { Bookmark20Filled, MoreHorizontalRegular } from "@fluentui/react-icons";
-import PanelRightToolbar from "./components/Panels/PanelRightToolbar.js";
+import PanelRightToolbar from "./coral.config/components/Panels/PanelRightToolbar.js";
 
 const PanelRightThird: React.FC = () => {
   return (

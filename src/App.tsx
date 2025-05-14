@@ -1,4 +1,11 @@
-import PanelLeft from "./components/Panels/PanelLeft.js";
+// Coral App Shell — Primary Layout
+// This file defines the structural framework of the Coral interface.
+// It wires together shared system components: header, panels, content shell, and modules.
+// All interactive behaviors and data logic are delegated to encapsulated components.
+
+import CoralShellColumn from "./coral.config/components/Layout/CoralShellColumn";
+import CoralShellRow from "./coral.config/components/Layout/CoralShellRow";
+import PanelLeft from "./coral.config/components/Panels/PanelLeft.js";
 import {
   Avatar,
   Button,
@@ -9,49 +16,37 @@ import {
   MoreHorizontalRegular,
   Sparkle20Filled
 } from "@fluentui/react-icons";
-import Header from "./components/Header/Header.js";
+import Header from "./coral.config/components/Header/Header.js";
 import "./index.css";
-import Content from "./components/Content/Content.js";
-import ContentToolbar from "./components/Content/ContentToolbar.js";
+import Content from "./coral.config/components/Content/Content.js";
+import ContentToolbar from "./coral.config/components/Content/ContentToolbar.js";
 import {
   Bookmark,
   DocumentSparkle,
   DrawerArrowDownload,
   Search,
   Sparkle,
-} from "./imports/bundleicons.js";
+} from "./coral.config/imports/bundleicons.js";
 import PanelRightFourth from "./PanelRightFourth.js";
-import HeaderTools from "./components/Header/HeaderTools.js";
-import PanelRightToggles from "./components/Header/PanelRightToggles.js";
+import HeaderTools from "./coral.config/components/Header/HeaderTools.js";
+import PanelRightToggles from "./coral.config/components/Header/PanelRightToggles.js";
 import PanelRightThird from "./PanelRightThird.js";
 import PanelRightSecond from "./PanelRightSecond.js";
 import PanelRightFirst from "./PanelRightFirst.js";
-import PanelLeftToolbar from "./components/Panels/PanelLeftToolbar.js";
-import Chat from "./modules/Chat.js";
+import PanelLeftToolbar from "./coral.config/components/Panels/PanelLeftToolbar.js";
+import Chat from "./coral.config/modules/Chat.js";
 
 const App: React.FC = () => {
-
-
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100vh",
-        overflow: "hidden",
-        backgroundColor: "var(--colorNeutralBackground3)",
-      }}
-    >
-      {/* Header */}
-      <Header
-      title="Microsoft"
-      subtitle="Coral"
-      logo={null}
-      >
+    <CoralShellColumn>
+      {/* HEADER */}
+      {/* Global bar for identity, session tools, and feature toggles */}
+      <Header title="Microsoft" subtitle="Coral" logo={null}>
         <HeaderTools>
           <Avatar />
           <ToolbarDivider />
-          {/* Panel Right Toggles define different panels the user can surface in the header. If there is only one, feel free to remove unused toggles. */}
+
+          {/* Panel visibility toggles — linked to right side modules */}
           <PanelRightToggles>
             <ToggleButton appearance="subtle" icon={<Sparkle />} />
             <ToggleButton appearance="subtle" icon={<DocumentSparkle />} />
@@ -61,25 +56,22 @@ const App: React.FC = () => {
         </HeaderTools>
       </Header>
 
-      <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
-
-        {/* Left Panel */}
+      <CoralShellRow>
+        {/* PANEL LEFT */}
+        {/* Resizable navigation or filter rail */}
         <div style={{ flexShrink: 0, display: "flex", overflow: "hidden" }}>
-          <PanelLeft 
-          panelWidth={280} // Defines the entry width for left panel
-          panelResize={true} // Defines if the panel is resizable
-          >
+          <PanelLeft panelWidth={280} panelResize={true}>
             <PanelLeftToolbar
-            panelTitle='Panel Left' // Defines the Title for the left panel
-            panelIcon={null} // Defines the icon for the Left Panel
-             />
+              panelTitle='Panel Left'
+              panelIcon={null}
+            />
           </PanelLeft>
         </div>
 
-        {/* Main Content with Dashboard */}
+        {/* MAIN CONTENT AREA */}
+        {/* Dynamic workspace where tools, features, and modules are rendered */}
         <Content>
           <ContentToolbar
-            // panelIcon={<Cube20Filled />}
             panelTitle="Copilot"
             panelIcon={<Sparkle20Filled/>}
           >
@@ -88,29 +80,24 @@ const App: React.FC = () => {
             <Button appearance="subtle" icon={<MoreHorizontalRegular />} />
           </ContentToolbar>
 
-
+          {/* Chat Module (LLM Interface) */}
+          {/* This shell is frontend-only. All backend connections must be passed via props. */}
           <Chat
-            apiUrl="http://localhost:5000"// Ensure this is correct
-            apiKey="" // API Key (only needed for OpenAI & Azure OpenAI)
-            // deploymentName="my-deployment" // Only needed for Azure OpenAI & Foundry
-            isAzureFoundry={false} // Flag for Azure AI Foundry
-            userId="user123" // Unique user ID (for multi-turn memory)
-          // onSaveMessage={saveChatHistory} // Callback to save chat history
-          // onLoadHistory={loadChatHistory} // Callback to load chat history
-          // onClearHistory={clearChatHistory} // Callback to clear chat history
+            apiUrl="http://localhost:5000"
+            apiKey=""
+            isAzureFoundry={false}
+            userId="user123"
           />
-
         </Content>
 
+        {/* PANEL RIGHT STACK */}
+        {/* These are modular extensions toggled from the header */}
         <PanelRightFirst />
-
         <PanelRightSecond />
-
         <PanelRightThird />
-
         <PanelRightFourth />
-      </div>
-    </div>
+      </CoralShellRow>
+    </CoralShellColumn>
   );
 };
 
