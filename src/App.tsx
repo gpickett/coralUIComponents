@@ -1,8 +1,3 @@
-// Coral App Shell — Primary Layout
-// This file defines the structural framework of the Coral interface.
-// It wires together shared system components: header, panels, content shell, and modules.
-// All interactive behaviors and data logic are delegated to encapsulated components.
-
 import CoralShellColumn from "./coral.config/components/Layout/CoralShellColumn";
 import CoralShellRow from "./coral.config/components/Layout/CoralShellRow";
 import PanelLeft from "./coral.config/components/Panels/PanelLeft.js";
@@ -16,12 +11,13 @@ import {
   AppGeneric20Regular,
   Attach20Regular,
   MoreHorizontalRegular,
+  Send20Regular,
   Sparkle20Filled,
 } from "@fluentui/react-icons";
-import Header from "./coral.config/components/Header/Header.js";
+import Header from "./coral.config/components/Header/Header";
 import "./index.css";
-import Content from "./coral.config/components/Content/Content.js";
-import ContentToolbar from "./coral.config/components/Content/ContentToolbar.js";
+import Content from "./coral.config/components/Content/Content";
+import ContentToolbar from "./coral.config/components/Content/ContentToolbar";
 import {
   Bookmark,
   DocumentSparkle,
@@ -29,22 +25,34 @@ import {
   History,
   Search,
   Sparkle,
-} from "./coral.config/imports/bundleicons.js";
-import PanelRightFourth from "./PanelRightFourth.js";
-import HeaderTools from "./coral.config/components/Header/HeaderTools.js";
-import PanelRightToggles from "./coral.config/components/Header/PanelRightToggles.js";
-import PanelRightThird from "./PanelRightThird.js";
-import PanelRightSecond from "./PanelRightSecond.js";
-import PanelRightFirst from "./PanelRightFirst.js";
-import PanelLeftToolbar from "./coral.config/components/Panels/PanelLeftToolbar.js";
-import Chat from "./coral.config/modules/Chat.js";
+} from "./coral.config/imports/bundleicons";
+import PanelRightFourth from "./PanelRightFourth";
+import HeaderTools from "./coral.config/components/Header/HeaderTools";
+import PanelRightToggles from "./coral.config/components/Header/PanelRightToggles";
+import PanelRightThird from "./PanelRightThird";
+import PanelRightSecond from "./PanelRightSecond";
+import PanelRightFirst from "./PanelRightFirst";
+import PanelLeftToolbar from "./coral.config/components/Panels/PanelLeftToolbar";
+import Chat from "./coral.config/modules/Chat";
+
+// Coral App Shell — Primary Layout
+// This file defines the structural framework of the Coral interface.
+// It wires together shared system components: header, panels, content shell, and modules.
+// All interactive behaviors and data logic are delegated to encapsulated components.
 
 const App: React.FC = () => {
   return (
     <CoralShellColumn>
       {/* HEADER */}
       {/* Global bar for identity, session tools, and feature toggles */}
-      <Header title="Microsoft" subtitle="Coral" logo={null}>
+
+      <Header
+      title="Microsoft"
+      subtitle="Coral"
+      logo={null}>
+
+
+      
         <HeaderTools>
           <Avatar />
           <ToolbarDivider />
@@ -59,11 +67,19 @@ const App: React.FC = () => {
         </HeaderTools>
       </Header>
 
+
+
+
+
+
+
       <CoralShellRow>
         {/* PANEL LEFT */}
         {/* Resizable navigation or filter rail */}
         <div style={{ flexShrink: 0, display: "flex", overflow: "hidden" }}>
-          <PanelLeft panelWidth={280} panelResize={true}>
+          <PanelLeft
+          panelWidth={280}
+          panelResize={true}>
             <PanelLeftToolbar panelTitle="Panel Left" panelIcon={null} />
           </PanelLeft>
         </div>
@@ -79,6 +95,8 @@ const App: React.FC = () => {
 
           {/* Chat Module (LLM Interface) */}
           {/* This shell is frontend-only. All backend connections must be passed via props. */}
+
+
           <Chat
             placeholder="Ask me anything..."
             apiUrl="http://localhost:5000"
@@ -89,6 +107,11 @@ const App: React.FC = () => {
             <Button appearance="subtle" icon={<Attach20Regular />} />
             <Button appearance="subtle" icon={<AppGeneric20Regular />} />
           </Chat>
+
+
+
+
+
         </Content>
 
         {/* PANEL RIGHT STACK */}

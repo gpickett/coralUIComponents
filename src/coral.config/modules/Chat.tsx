@@ -1,15 +1,16 @@
-// 🪸 ChatShell — Frontend Chat UI with Backend Plugin Hooks
+// 🪸 Chat — Stream-enabled Frontend Chat UI
 // This component is split into two clearly defined roles:
 //
 // ─────────────────────────────────────────────────────────────
 // 💄 FRONTEND (owned by: designer/dev)
 // - UI layout and rendering
 // - Input control and scroll behavior
-// - Message history display
+// - Markdown rendering
+// - Streaming UI update on assistant response
 //
 // 🔗 BACKEND (owned by: backend dev)
-// - Message submission (`onSendMessage`)
-// - History persistence (`onSaveMessage`, `onLoadHistory`, `onClearHistory`)
+// - Message submission (`onSendMessage`) — must yield string chunks
+// - History persistence (`onSaveMessage`, `onLoadHistory`, `onClearHistory`) — optional
 // ─────────────────────────────────────────────────────────────
 
 import React, { useState, useEffect, useRef } from "react";
@@ -22,50 +23,46 @@ import {
   Tag,
   Tooltip as FluentTooltip,
   ToolbarDivider,
-  Caption1,
 } from "@fluentui/react-components";
 import { Copy, Send } from "../imports/bundleicons";
-import { AppFolder20Regular, Attach20Regular, HeartRegular } from "@fluentui/react-icons";
+import { HeartRegular } from "@fluentui/react-icons";
 import "./Chat.css";
 import "./prism-material-oceanic.css";
-import HeaderTools from "../components/Header/HeaderTools";
-
-// 💬 Message Type
-export interface ChatMessage {
-  role: "user" | "assistant";
-  content: string;
-}
 
 // 🔌 PROPS CONTRACT (Frontend-Backend Integration)
-interface ChatShellProps {
+interface ChatProps {
   userId: string;
 
-  // 🔗 BACKEND DEV: Required
-  // Sends input + history to backend (OpenAI, Azure, Claude, etc.)
-  onSendMessage: (input: string, history: ChatMessage[]) => Promise<string>;
+  // 🔗 BACKEND DEV: Required if streaming enabled
+  // Sends user input and chat history to backend and yields assistant response chunks
+  onSendMessage?: (
+    input: string,
+    history: { role: string; content: string }[]
+  ) => AsyncIterable<string>;
 
   // 🔗 BACKEND DEV: Optional
-  // Persists chat state (localStorage, database, etc.)
-  onSaveMessage?: (userId: string, messages: ChatMessage[]) => void;
-  onLoadHistory?: (userId: string) => Promise<ChatMessage[]>;
+  // Used for chat history persistence (localStorage, DB, etc.)
+  onSaveMessage?: (
+    userId: string,
+    messages: { role: string; content: string }[]
+  ) => void;
+  onLoadHistory?: (
+    userId: string
+  ) => Promise<{ role: string; content: string }[]>;
   onClearHistory?: (userId: string) => void;
-
-    // FRONTEND
-    placeholder?: string;
-    children?: React.ReactNode; // for custom tools
 }
 
-const ChatShell: React.FC<ChatShellProps> = ({
+const Chat: React.FC<ChatProps> = ({
   userId,
   onSendMessage,
   onSaveMessage,
   onLoadHistory,
   onClearHistory,
-  placeholder,
-  children
 }) => {
-  // 🧠 STATE — Owned by Frontend
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  // 🧠 STATE — Frontend-owned
+  const [messages, setMessages] = useState<{ role: string; content: string }[]>(
+    []
+  );
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
@@ -76,25 +73,29 @@ const ChatShell: React.FC<ChatShellProps> = ({
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const inputContainerRef = useRef<HTMLDivElement>(null);
 
-  // 🔄 LIFECYCLE: Load Message History — Backend Owned
+  // 🔄 LIFECYCLE: Load chat history — Backend owned
   useEffect(() => {
-    onLoadHistory?.(userId)
-      .then((history) => {
-        if (history) setMessages(history);
-      })
-      .catch(() => console.error("Failed to load chat history."));
+    if (onLoadHistory) {
+      onLoadHistory(userId)
+        .then((history) => {
+          if (history) setMessages(history);
+        })
+        .catch(() => {
+          console.error("Failed to load chat history.");
+        });
+    }
   }, [onLoadHistory, userId]);
 
-  // 🌀 UI: Auto-scroll on new message
+  // 🌀 UI: Auto-scroll to bottom on new message
   useEffect(() => {
-    const container = messagesContainerRef.current;
-    if (container) {
-      container.scrollTop = container.scrollHeight;
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop =
+        messagesContainerRef.current.scrollHeight;
       setShowScrollButton(false);
     }
   }, [messages]);
 
-  // 🧭 UI: Show scroll button if scrolled away
+  // 🧭 UI: Show scroll button if user is far from bottom
   useEffect(() => {
     const container = messagesContainerRef.current;
     if (!container) return;
@@ -108,14 +109,30 @@ const ChatShell: React.FC<ChatShellProps> = ({
     return () => container.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // 📏 UI: Track input height for padding
+  // 📏 UI: Track input container height to offset scroll button
   useEffect(() => {
     if (inputContainerRef.current) {
       setInputHeight(inputContainerRef.current.offsetHeight);
     }
   }, [input, isFocused]);
 
-  // 📩 SEND MESSAGE — Backend Required
+  // 🎯 UI: Scroll to bottom programmatically
+  const scrollToBottom = () => {
+    messagesContainerRef.current?.scrollTo({
+      top: messagesContainerRef.current.scrollHeight,
+      behavior: "smooth",
+    });
+    setShowScrollButton(false);
+  };
+
+  // 📋 COPY FUNCTION — Frontend owned
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text).catch((err) => {
+      console.error("Failed to copy text:", err);
+    });
+  };
+
+  // 📩 SEND MESSAGE — Backend required if streaming is enabled
   const sendMessage = async () => {
     if (!input.trim()) return;
 
@@ -126,56 +143,83 @@ const ChatShell: React.FC<ChatShellProps> = ({
     textareaRef.current && (textareaRef.current.style.height = "auto");
 
     try {
-      const assistantResponse = await onSendMessage(input, updatedMessages);
-      const newHistory = [...updatedMessages, { role: "assistant", content: assistantResponse }];
-      setMessages(newHistory);
+      if (onSendMessage) {
+        // Streamed response handling
+        let assistantContent = "";
+        setMessages([...updatedMessages, { role: "assistant", content: "" }]);
 
-      // 🔗 BACKEND HOOK (optional)
-      onSaveMessage?.(userId, newHistory);
+        for await (const chunk of onSendMessage(input, updatedMessages)) {
+          assistantContent += chunk;
+          setMessages((prev) => {
+            const updated = [...prev];
+            updated[updated.length - 1] = {
+              role: "assistant",
+              content: assistantContent,
+            };
+            return updated;
+          });
+        }
+
+        // 🔗 Optional backend hook
+        onSaveMessage?.(userId, [
+          ...updatedMessages,
+          { role: "assistant", content: assistantContent },
+        ]);
+      } else {
+        // Fallback message if no backend wired up
+        setMessages([
+          ...updatedMessages,
+          { role: "assistant", content: "🤖 No backend connected yet." },
+        ]);
+      }
     } catch (err) {
       console.error("Send Message Error:", err);
       setMessages([
         ...updatedMessages,
-        { role: "assistant", content: "Oops! Something went wrong sending your message." },
+        {
+          role: "assistant",
+          content: "Oops! Something went wrong sending your message.",
+        },
       ]);
     } finally {
       setIsTyping(false);
     }
   };
 
-  // 🧽 CLEAR HISTORY — Backend Optional
+  // 🧽 CLEAR CHAT — Optional backend hook
   const clearChat = () => {
     setMessages([]);
     onClearHistory?.(userId);
   };
 
-  // 📋 COPY FUNCTION — Frontend Owned
-  const handleCopy = (text: string) => {
-    navigator.clipboard.writeText(text).catch((err) => {
-      console.error("Failed to copy text:", err);
-    });
-  };
-
-  // 🎯 UI: Scroll back to bottom
-  const scrollToBottom = () => {
-    messagesContainerRef.current?.scrollTo({
-      top: messagesContainerRef.current.scrollHeight,
-      behavior: "smooth",
-    });
-    setShowScrollButton(false);
-  };
-
   return (
     <div className="chat-container">
-      {/* 💬 MESSAGES UI — Frontend Controlled */}
-      <div className="messages" ref={messagesContainerRef} style={{ flex: 1, overflowY: "auto", minHeight: 0 }}>
+      {/* 💬 MESSAGES DISPLAY — Frontend owned */}
+      <div
+        className="messages"
+        ref={messagesContainerRef}
+        style={{ flex: 1, overflowY: "auto", minHeight: 0 }}
+      >
         {messages.map((msg, index) => (
           <div key={index} className={`message ${msg.role}`}>
             <Body1>
-              <div style={{ display: "flex", flexDirection: "column", whiteSpace: "pre-wrap", width: "100%" }}>
-                <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypePrism]}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  whiteSpace: "pre-wrap",
+                  width: "100%",
+                }}
+              >
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  rehypePlugins={[rehypePrism]}
+                >
                   {msg.content}
                 </ReactMarkdown>
+
+                {/* ❤️ COPY + LIKE for assistant messages */}
+                {/* ONLY COPY BUTTON IS FUNCTIONAL FOR NOW */}
                 {msg.role === "assistant" && (
                   <div className="assistant-footer">
                     <div className="assistant-actions">
@@ -187,7 +231,9 @@ const ChatShell: React.FC<ChatShellProps> = ({
                         icon={<Copy />}
                       />
                       <Button
-                        onClick={() => console.log("Heart clicked for response:", msg.content)}
+                        onClick={() =>
+                          console.log("Heart clicked for response:", msg.content)
+                        }
                         title="Like"
                         appearance="subtle"
                         style={{ height: 28, width: 28 }}
@@ -202,7 +248,7 @@ const ChatShell: React.FC<ChatShellProps> = ({
         ))}
       </div>
 
-      {/* 🔽 SCROLL BUTTON — Frontend UI */}
+      {/* 🔽 SCROLL TO BOTTOM — if user scrolls up */}
       {showScrollButton && (
         <Tag
           onClick={scrollToBottom}
@@ -210,18 +256,19 @@ const ChatShell: React.FC<ChatShellProps> = ({
           shape="circular"
           style={{
             bottom: inputHeight,
-            backgroundColor: "transparent",
+            backgroundColor: "var(--colorNeutralBackgroundAlpha2)",
             backdropFilter: "saturate(180%) blur(16px)",
-            color: "var(--colorNeutralForeground2)",
-            border: "1px solid var(--colorNeutralStroke1)"
           }}
         >
           Back to bottom
         </Tag>
       )}
 
-      {/* 🎙 INPUT FIELD — Frontend Controlled */}
-      <div className={`input-wrapper ${isFocused ? "focused" : ""}`} ref={inputContainerRef}>
+      {/* 🖊 INPUT + ACTIONS — Frontend owned */}
+      <div
+        className={`input-wrapper ${isFocused ? "focused" : ""}`}
+        ref={inputContainerRef}
+      >
         <textarea
           ref={textareaRef}
           value={input}
@@ -240,28 +287,33 @@ const ChatShell: React.FC<ChatShellProps> = ({
           }}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          placeholder={placeholder || "Type a message..."}
-
+          placeholder="Type a message..."
           rows={1}
           className="input-field"
         />
 
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", maxHeight:'32px'}}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
           <FluentTooltip content="AI-generated content may be incorrect." relationship="label">
             <Tag appearance="filled" size="small">AI Generated</Tag>
           </FluentTooltip>
-          <HeaderTools>
-  <Button appearance="transparent" onClick={sendMessage} icon={<Send />} />
-  {children && <ToolbarDivider />}
-  {children}
-</HeaderTools>
 
-
+          <div style={{ display: "flex" }}>
+            <Button appearance="transparent" onClick={sendMessage} icon={<Send />} />
+            <ToolbarDivider />
+            <Button appearance="transparent" onClick={sendMessage} icon={<Send />} />
+          </div>
         </div>
+
         <span className="focus-indicator" />
       </div>
-      <Caption1 style={{color:'var(--colorNeutralForeground3', marginTop:'-8px', paddingBottom:'6px', textAlign:'center'}}>AI-Generated content may be incorrect</Caption1>
-      {/* 🧼 CLEAR CHAT BUTTON — Backend Optional */}
+
+      {/* 🧼 CLEAR BUTTON — Backend optional */}
       {onClearHistory && (
         <button onClick={clearChat}>Clear Chat</button>
       )}
@@ -269,4 +321,4 @@ const ChatShell: React.FC<ChatShellProps> = ({
   );
 };
 
-export default ChatShell;
+export default Chat;

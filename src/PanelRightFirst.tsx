@@ -9,7 +9,7 @@ const PanelRightFirst: React.FC = () => {
     <div>
       <PanelRight 
       panelWidth={450} // Defines entry width for right panel. Only needed on first panel.
-      defaultClosed={false} // Is the panel closed or open on default? Only needed on first panel.
+      defaultClosed={true} // Is the panel closed or open on default? Only needed on first panel.
       panelResize={true} // Defines if the panel can be resized or not
       panelType="first" // Connected to PanelRightToggles in the header.
 
